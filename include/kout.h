@@ -3,13 +3,27 @@
 #include <cstddef>
 #include <cstdint>
 
+class KOut
+{
+public:
+    KOut();
+
+    KOut& operator<<(const char* str);
+    KOut& operator<<(char c);
+    KOut& operator<<(int num);
+    KOut& operator<<(uint32_t num);
+    KOut& operator<<(void* ptr);
+};
+
+extern KOut kout;
+
 namespace terminal
 {
     constexpr int k_VGAWidth { 80 };
     constexpr int k_VGAHeight { 25 };
     constexpr uint32_t k_VGAMemory { 0xB8000 };
 
-    enum vga_color {
+    enum Color {
         VGA_COLOR_BLACK = 0,
         VGA_COLOR_BLUE = 1,
         VGA_COLOR_GREEN = 2,
@@ -29,7 +43,7 @@ namespace terminal
     };
     
     
-    inline constexpr uint8_t vga_entry_color(vga_color fg, vga_color bg) 
+    inline constexpr uint8_t vga_entry_color(Color fg, Color bg) 
     {
         return fg | bg << 4;
     }
@@ -39,15 +53,3 @@ namespace terminal
         return (uint16_t) uc | (uint16_t) color << 8;
     }
 }
-
-class KOut
-{
-public:
-    KOut();
-
-    KOut& operator<<(const char* str);
-    KOut& operator<<(char c);
-    KOut& operator<<(int num);
-};
-
-extern KOut kout;

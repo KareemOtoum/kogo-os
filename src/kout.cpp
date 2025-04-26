@@ -20,6 +20,67 @@ KOut& KOut::operator<<(const char* str)
     return kout;
 }
 
+KOut& KOut::operator<<(char c)
+{
+	terminal_putchar(c);
+
+	return kout;
+}
+
+KOut& KOut::operator<<(int num)
+{
+	if(num == 0)
+	{
+		kout << '0';
+	}
+	if(num < 0)
+	{
+		kout << "-";
+	}
+
+	char buffer[10];
+	int i {};
+	while(num > 0)
+	{
+		buffer[i++] = '0' + num % 10;
+		num /= 10;
+	}
+
+	while(i--)
+	{
+		kout << buffer[i];
+	}
+	
+	return kout;
+}
+
+KOut& KOut::operator<<(uint32_t hex)
+{
+    kout << "0x";  // print "0x" at the start
+
+    for (int i = 7; i >= 0; i--) 
+    {
+        uint8_t nibble = (hex >> (i * 4)) & 0xF;
+        if (nibble < 10) 
+        {
+            kout << static_cast<char>('0' + nibble);  // Prints '0'-'9'
+        }
+        else 
+        {
+            kout << static_cast<char>('A' + (nibble - 10));  // Prints 'A'-'F'
+        }
+    }
+
+    return kout;
+}
+
+KOut& KOut::operator<<(void* ptr)
+{
+	kout << reinterpret_cast<uintptr_t>(ptr);
+
+	return kout;
+}
+
 size_t strlen(const char* str) 
 {
 	size_t len = 0;
@@ -50,7 +111,8 @@ void clear_screen()
 
 void terminal_initialize(void) 
 {
-	terminal_color = terminal::vga_entry_color(terminal::VGA_COLOR_LIGHT_GREY, terminal::VGA_COLOR_BLACK);
+	terminal_color = terminal::vga_entry_color(
+        terminal::VGA_COLOR_LIGHT_GREY, terminal::VGA_COLOR_BLACK);
 	clear_screen();
 }
 
@@ -65,6 +127,30 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 	terminal_buffer[index] = terminal::vga_entry(c, color);
 }
 
+void terminal_scrolltwo()
+{
+	for(int y{}; y < terminal::k_VGAHeight - 2; ++y)
+	{
+		for(int x{}; x < terminal::k_VGAWidth; ++x)
+		{
+			terminal_buffer[y * terminal::k_VGAWidth + x] = 
+				terminal_buffer[(y + 2) * terminal::k_VGAWidth + x];
+		}
+	}
+
+	// clear last two lines and set cursor there
+	for(int y{ terminal::k_VGAHeight - 2 }; y < terminal::k_VGAHeight; ++y)
+	{
+		for(int x{}; x < terminal::k_VGAWidth; ++x)
+		{
+			terminal_putentryat(' ', terminal_color, x, y);
+		}
+	}
+
+	terminal_column = 0;
+	terminal_row = terminal::k_VGAHeight - 2;
+}
+
 void terminal_putchar(char c) 
 {
     if(c == '\n')
@@ -73,18 +159,19 @@ void terminal_putchar(char c)
         ++terminal_row; 
         if(terminal_row == terminal::k_VGAHeight)
         {
-            clear_screen();
+			terminal_scrolltwo();
         }
         return;
     }
 
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+
 	if (++terminal_column == terminal::k_VGAWidth) {
 		terminal_column = 0;
 		if (++terminal_row == terminal::k_VGAHeight)
         {
-            clear_screen();
-        }
+            terminal_scrolltwo();        
+		}
 	}
 }
 
