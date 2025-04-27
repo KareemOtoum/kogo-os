@@ -11,6 +11,7 @@ public:
     KOut& operator<<(const char* str);
     KOut& operator<<(char c);
     KOut& operator<<(int num);
+    // need to fix this to be able to print sizet instead of hex
     KOut& operator<<(uint32_t num);
     KOut& operator<<(void* ptr);
 };

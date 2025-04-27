@@ -58,4 +58,5 @@ SECTIONS
 		__CTOR_END__ = .;
 	}
 
+	_kernel_end = .;
 }
