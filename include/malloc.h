@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
+#include "kout.h"
 
 namespace alloc
 {
@@ -25,6 +26,8 @@ namespace alloc
 
 void create_heap();
 size_t free_mem();
+void log_freelist();
+void scan_heap();
 
 void* malloc(size_t size);
 void free(void* ptr);

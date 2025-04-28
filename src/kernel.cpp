@@ -29,42 +29,37 @@ void print_logo()
 void malloc_test()
 {
     kout << "Setting up heap at " << alloc::k_HeapStart << "\n";
-    kout << "Heap Size: " << static_cast<int>(alloc::k_HeapSize) << "\n";
     kout << "Free memory: " << static_cast<int>(free_mem()) << "\n";
     kout << "allocating 10 integers 40 bytes" << '\n';
     
     int* arr { reinterpret_cast<int*>(malloc(sizeof(int) * 10)) };
+    log_freelist();
 
-    kout << "Size of Free block: " << static_cast<size_t>(sizeof(alloc::Block)) << "\n";
-    kout << "Size of Allocation Header: " << static_cast<size_t>(sizeof(alloc::Header)) << "\n";
-    for(int i{}; i < 10; ++i)
-    {
-        arr[i] = i;
-        kout << arr[i] << " address: " << &arr[i] << "\n";
-    }
     kout << "Free memory: " << static_cast<int>(free_mem()) << "\n";
+    
+    kout << "Freeing integer array of 10 elements\n";
+    free(arr);
+    kout << "Free memory: " << static_cast<int>(free_mem()) << "\n";
+    log_freelist();
 
-    int alloc_size = free_mem() - 8;
-    auto rest = malloc(alloc_size);
-    if(rest)
+    kout << "Allocating " << static_cast<int>(free_mem() - 48) << "\n";
+
+    char* arr2 { reinterpret_cast<char*>(malloc(free_mem() - 48)) };
+    if(arr2)
     {
-        kout << "allocated " << alloc_size << " bytes" << "\n";
+        kout << "successfully allocated\n";
     }
     else
     {
-        kout << "couldnt allocate the rest of the memory\n";
+        kout << "allocation failed\n";
     }
-
+    log_freelist();
     kout << "Free memory: " << static_cast<int>(free_mem()) << "\n";
 
-    char* more { reinterpret_cast<char*>(malloc(1)) };
-    if(!more)
-    {
-        kout << "couldnt find available memory\n";
-    }
-    else
-    {
-        kout << "allocated more\n";
-    }
+    kout << "Freeing\n";
+    free(arr2);
     kout << "Free memory: " << static_cast<int>(free_mem()) << "\n";
+    log_freelist();
+
+
 }
