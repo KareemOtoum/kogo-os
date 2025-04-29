@@ -41,39 +41,6 @@ void log_freelist()
     }
 }
 
-void scan_heap()
-{
-    using namespace alloc;
-    uint8_t* heap = reinterpret_cast<uint8_t*>(k_HeapStart);
-    uint8_t* end  = heap + k_HeapSize;
-
-    while (heap < end)
-    {
-        Header* header = reinterpret_cast<Header*>(heap);
-        
-        // Check if it looks like a valid allocation
-        if (header->m_magic == k_MagicNum)
-        {
-            kout << "[ALLOCATED] at " << header 
-                 << " size: " << static_cast<int>(header->m_size) << "\n";
-            
-            size_t total_alloc_size = header->m_size + sizeof(Header);
-            heap += total_alloc_size;
-        }
-        else
-        {
-            Block* block = reinterpret_cast<Block*>(heap);
-
-            kout << "[FREE BLOCK] at " << block 
-                 << " size: " << static_cast<int>(block->m_size) << "\n";
-            
-            size_t total_free_size = block->m_size + sizeof(Block);
-            heap += total_free_size;
-        }
-    }
-}
-
-
 void* malloc(size_t size)
 {
     using namespace alloc;
@@ -151,6 +118,56 @@ void* malloc(size_t size)
     return nullptr;
 }
 
+void merge(alloc::Block* prev, alloc::Block* next)
+{
+    if(!prev || !next) return;
+
+    using namespace alloc;
+
+    prev->m_size += next->m_size + sizeof(Block);
+    prev->m_next = next->m_next;
+
+    // checking if the removed block is the tail
+    if(!next->m_next)
+    {
+        tail = prev;
+    }
+}
+
+// handles the entire process of coalescing when freeing a block
+void coalesce(alloc::Block* block, alloc::Block* prev)
+{
+    if(!block) return;
+
+    using namespace alloc;
+    
+    auto is_adjacent = [](Block* prev, Block* next)
+    {
+        return reinterpret_cast<char*>(prev) + prev->m_size + sizeof(Block) 
+        == reinterpret_cast<char*>(next);
+    };
+    
+    // try to merge with next block first
+    if(block->m_next)
+    {
+        if(is_adjacent(block, block->m_next))
+        {
+            kout << "merging free block with block infront of it\n";
+            merge(block, block->m_next);
+        }
+    }
+
+    // merge with prev 
+    if(prev)
+    {
+        if(is_adjacent(prev, block))
+        {
+            kout << "merging free blocks prev with it\n";
+            merge(prev, block);
+        }
+    }
+}
+
 void free(void* ptr)
 {
     using namespace alloc;
@@ -175,15 +192,32 @@ void free(void* ptr)
     free_block->m_size = freed_size - sizeof(Block);
     free_block->m_next = nullptr;
 
-    // if head is nullptr set it as head and tail because that means free list is empty
-    if(!head)
+    Block* curr { head };
+    Block* prev { nullptr };
+
+    // make curr the free block after this one
+    // and prev the one before it
+    while (curr && curr < free_block)
+    {
+        prev = curr;
+        curr = curr->m_next;
+    }
+    
+    free_block->m_next = curr;
+
+    if(prev)
+    {
+        prev->m_next = free_block;
+    }
+    else // its the first block
     {
         head = free_block;
-        tail = head;
     }
-    else // if head is not null set tail to point to this new free block.
+
+    if(!free_block->m_next) // its the tail
     {
-        tail->m_next = free_block;
         tail = free_block;
     }
+
+    coalesce(free_block, prev);
 }
