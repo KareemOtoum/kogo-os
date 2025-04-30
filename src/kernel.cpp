@@ -7,7 +7,6 @@ void print_logo();
 
 extern "C" void kernel_main(void) 
 {
-    call_global_constructors();
     create_heap();
     
     print_logo();

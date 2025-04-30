@@ -2,11 +2,11 @@
 
 typedef void (*constructor_t)();
 
-extern "C" constructor_t __CTOR_LIST__;
-extern "C" constructor_t __CTOR_END__;
+extern "C" constructor_t __ctors_start;
+extern "C" constructor_t __ctors_end;
 
 extern "C" void call_global_constructors() {
-    for (constructor_t* ctor = &__CTOR_LIST__; ctor < &__CTOR_END__; ++ctor) {
+    for (constructor_t* ctor = &__ctors_start; ctor < &__ctors_end; ++ctor) {
         (*ctor)();
     }
 }

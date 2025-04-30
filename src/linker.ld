@@ -47,16 +47,13 @@ SECTIONS
 		*(.bss)
 	}
 
-	/* The compiler may produce other sections, by default it will put them in
-	   a segment with the same name. Simply add stuff here as needed. */
-	/* Add this inside SECTIONS */
-	.ctors :
-	{
-		__CTOR_LIST__ = .;
-		KEEP(*(.ctors))
-		KEEP(*(SORT(.ctors.*)))
-		__CTOR_END__ = .;
-	}
+	/* global constructors */
+	.ctors : {
+        __ctors_start = .;
+        KEEP(*(SORT(.ctors.*)))
+        KEEP(*(.ctors))
+        __ctors_end = .;
+    }
 
 	_kernel_end = .;
 }
