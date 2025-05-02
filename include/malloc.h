@@ -29,5 +29,8 @@ size_t free_mem();
 void log_freelist();
 void scan_heap();
 
+extern "C"
+{
 void* malloc(size_t size);
 void free(void* ptr);
+}

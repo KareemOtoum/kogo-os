@@ -1,3 +1,5 @@
+/* credit to osdev.org for this file */
+
 /* Declare constants for the multiboot header. */
 .set ALIGN,    1<<0             /* align loaded modules on page boundaries */
 .set MEMINFO,  1<<1             /* provide memory map */
@@ -76,7 +78,8 @@ _start:
 	C++ features such as global constructors and exceptions will require
 	runtime support to work as well.
 	*/
-
+	
+	call setup_gdt
 	call call_global_constructors
 
 	/*

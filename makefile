@@ -10,12 +10,14 @@ LD := i686-elf-g++
 GRUB_MKRESCUE := grub-mkrescue
 
 ASFLAGS :=
-CXXFLAGS := -Iinclude -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+								# -02 was acting up
+CXXFLAGS := -Iinclude -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
 LDFLAGS := -T $(SRC_DIR)/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 
-ASM_SRC := $(SRC_DIR)/boot.asm
+ASM_SRC := $(wildcard $(SRC_DIR)/*.asm)
 CPP_SRC := $(wildcard $(SRC_DIR)/*.cpp)
-ASM_OBJ := $(BUILD_DIR)/boot.o
+
+ASM_OBJS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/%.o, $(ASM_SRC))
 CPP_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CPP_SRC))
 
 KERNEL_BIN := $(BUILD_DIR)/kernel.bin
@@ -25,7 +27,7 @@ ISO := $(BUILD_DIR)/os.iso
 
 all: $(ISO)
 
-$(ASM_OBJ): $(ASM_SRC)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.asm
 	@mkdir -p $(BUILD_DIR)
 	$(AS) $(ASFLAGS) -o $@ $<
 
@@ -33,7 +35,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(KERNEL_BIN): $(ASM_OBJ) $(CPP_OBJS)
+$(KERNEL_BIN): $(ASM_OBJS) $(CPP_OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 $(ISO): $(KERNEL_BIN)
@@ -43,7 +45,7 @@ $(ISO): $(KERNEL_BIN)
 	$(GRUB_MKRESCUE) -o $@ $(ISO_DIR)
 
 run: $(ISO)
-	qemu-system-i386 -cdrom $(ISO)
+	qemu-system-i386 -cdrom $(ISO) -d int -cpu qemu64
 
 clean:
 	rm -rf $(BUILD_DIR)
