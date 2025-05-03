@@ -23,19 +23,19 @@ void pic_remap(int offset1, int offset2) {
     uint8_t a1 = inb(0x21);
     uint8_t a2 = inb(0xA1);
 
-    // Start initialization of both PICs
+    // initialization of both PICs
     outb(0x20, 0x11); // Start init of master PIC
     io_wait();
     outb(0xA0, 0x11); // Start init of slave PIC
     io_wait();
 
-    // Set new vector offsets
-    outb(0x21, offset1); // Master PIC vector offset (e.g., 0x20)
+    // set new vector offsets
+    outb(0x21, offset1); // master PIC vector offset (0x20)
     io_wait();
-    outb(0xA1, offset2); // Slave PIC vector offset (e.g., 0x28)
+    outb(0xA1, offset2); // slave PIC vector offset (0x28)
     io_wait();
 
-    // Tell master PIC about the slave PIC at IRQ2
+    // tell master PIC about the slave PIC at IRQ2
     outb(0x21, 0x04); // 0000 0100 = IRQ2 has slave
     io_wait();
     outb(0xA1, 0x02); // Slave identity = cascade on IRQ2

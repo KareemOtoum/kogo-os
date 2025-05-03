@@ -2,6 +2,8 @@
 #include "malloc.h"
 #include "idt.h"
 #include "new.h"
+#include "keyboard_driver.h"
+#include "shell.h"
 
 void malloc_test();
 void print_logo();
@@ -9,20 +11,22 @@ void print_logo();
 extern "C" void kernel_main(void) 
 {
     create_heap();
-    print_logo();
     init_idt();
-    
-    kout << "Enabling interrupts...\n";
+    print_logo();
     
     // Enable interrupts
     asm volatile("sti");
     
-    kout << "Interrupts enabled. Waiting for events...\n";
+    shell.start(); // shell is an infinite loop
+
+    shell.stop();
+    kout << "Common command line exercise";
+    shell.start();
     
-    while(1) {
-        asm volatile("hlt");  // Halt until next interrupt
-    }// Keep CPU busy so we can receive interrupts
-    
+    while(1)
+    {
+        asm volatile ("hlt");
+    }
 }
 
 void print_logo()

@@ -81,6 +81,35 @@ KOut& KOut::operator<<(void* ptr)
 	return kout;
 }
 
+void KOut::set_cursor_state(bool enable)
+{
+    outb(0x3D4, 0x0A);
+    uint8_t cursor_start = inb(0x3D5);
+
+    if (enable)
+	{
+		cursor_start &= ~(1 << 5); // clear bit 5 to enable
+	}
+    else
+	{
+		cursor_start |= (1 << 5);  // set bit 5 to disable
+	}
+
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, cursor_start);
+}
+
+void set_cursor_position(uint16_t row, uint16_t col) 
+{
+    uint16_t position = row * 80 + col;
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, position & 0xFF);
+
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (position >> 8) & 0xFF);
+}
+
 size_t strlen(const char* str) 
 {
 	size_t len = 0;
@@ -173,5 +202,7 @@ void terminal_putchar(char c)
             terminal_scrolltwo();        
 		}
 	}
+
+	set_cursor_position(terminal_row, terminal_column);
 }
 

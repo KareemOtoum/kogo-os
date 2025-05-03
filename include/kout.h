@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "idt.h"
 
 class KOut
 {
@@ -14,6 +15,8 @@ public:
     // need to fix this to be able to print sizet instead of hex
     KOut& operator<<(uint32_t num);
     KOut& operator<<(void* ptr);
+
+    void set_cursor_state(bool state);
 };
 
 extern KOut kout;
