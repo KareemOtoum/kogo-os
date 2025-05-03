@@ -17,16 +17,7 @@ extern "C" void kernel_main(void)
     // Enable interrupts
     asm volatile("sti");
     
-    shell.start(); // shell is an infinite loop
-
-    shell.stop();
-    kout << "Common command line exercise";
     shell.start();
-    
-    while(1)
-    {
-        asm volatile ("hlt");
-    }
 }
 
 void print_logo()

@@ -7,19 +7,24 @@ void Shell::interrupt(char c)
     if(c == '\0') return;
 
     kout << c;
-    if(c == '\n') kout << " > ";
+    if(c == '\n' && show_prompt) kout << " > ";
 }
 
 void Shell::start()
 {
     kout << "\n";
-    kout.set_cursor_state(true);
+    
+    KIn::InputString input;
 
-    kout << " > ";
-}
+    while(1)
+    {
+        kout.set_cursor_state(true);
+        kout << " > ";
 
-void Shell::stop()
-{
-    kout.set_cursor_state(false);
-    kout << "\n";
+        show_prompt = false;
+        kin.get_line(input);
+        kout.set_cursor_state(false);
+        kout << input.data() << "\n";
+        show_prompt = true;
+    }
 }
