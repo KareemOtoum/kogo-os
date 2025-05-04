@@ -4,6 +4,7 @@
 #include "new.h"
 #include "keyboard_driver.h"
 #include "shell.h"
+#include "bitmap.h"
 
 void malloc_test();
 void print_logo();
@@ -17,7 +18,8 @@ extern "C" void kernel_main(void)
     // Enable interrupts
     asm volatile("sti");
     
-    shell.start();
+    //shell.start();
+    init_bitmap();
 }
 
 void print_logo()
