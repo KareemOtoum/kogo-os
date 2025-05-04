@@ -35,7 +35,7 @@ the cross compiler can be built by following this tutorial: https://wiki.osdev.o
 ### 🚀 Build
 
 ```bash
-git clone https://github.com/KareemOtoum/kogo-os
+git clone https://github.com/KareemOtoum/kogo-os.git
 cd kogo-os
 make run
 ```
