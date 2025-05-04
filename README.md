@@ -8,14 +8,13 @@ interrupt handling, kernel memory management, and VGA text output.
 
 ## 🧠 Features  
 
-- ✅ **32-bit x86 architecture**
-- ✅ **Free list `kmalloc` for dynamic kernel memory allocation**
+- ✅ **Free list `malloc` for dynamic kernel memory allocation**
 - ✅ **Flat memory model**
-- ✅ **VGA text-mode kernel output**
+- ✅ **VGA text-mode with cout-like driver interface**
 - ✅ **Basic shell with keyboard input via hardware interrupts**
 - ✅ **Physical memory page allocator using a bitmap**
 - ✅ **Virtual memory with paging (4 KiB pages)**
-- ✅ **Grub Bootloader**
+- ✅ **Grub Bootloader**  
 
 ## 🚧 Roadmap  
 - Processes and scheduling
@@ -27,9 +26,11 @@ interrupt handling, kernel memory management, and VGA text output.
 
 ### 🔨 Requirements
 
-- GCC cross-compiler for i386 (`i686-elf-gcc`) with c++ enabled
-- GCC binutils and ld
+- GCC 14.2.0 cross-compiler for `i686-elf-gcc` with c++ enabled
+- GCC binutils 2.44 
 - QEMU
+
+the cross compiler can be built by following this tutorial: https://wiki.osdev.org/GCC_Cross-Compiler
 
 ### 🚀 Build
 
