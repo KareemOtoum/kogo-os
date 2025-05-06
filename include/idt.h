@@ -43,3 +43,4 @@ extern "C" void pic_send_eoi(unsigned char irq);
 // handlers
 extern "C" void isr33(); // asm keyboard handler
 extern "C" void isr32(); // asm timer int handler
+extern "C" void isr14(); // page fault handler

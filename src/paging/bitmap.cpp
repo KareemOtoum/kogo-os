@@ -15,6 +15,7 @@ void init_bitmap()
         if (frame_to_address(i) >= (void*)phys::k_KernelMemoryEnd)
         {
             kout << "Free pages start at page " << i << " address " << frame_to_address(i) << "\n";
+            kout << "Pages allocated for OS: " << total_pages - (total_pages- i) << "\n";
             break;
         }
 

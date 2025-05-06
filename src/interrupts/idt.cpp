@@ -65,15 +65,14 @@ extern "C" void pic_send_eoi(unsigned char irq)
 
 void init_idt()
 {
-
     pic_remap(0x20, 0x28);
     
     set_entry(0x21, isr33, 0x08, 0x8E); // Keyboard IRQ1
     set_entry(0x20, isr32, 0x08, 0x8E); // Timer IRQ0
+    set_entry(14, isr14, 0x08, 0x8E); // Timer IRQ0
     
     idt_ptr.base = reinterpret_cast<uint32_t>(&idt);
     idt_ptr.limit = sizeof(idt) - 1;
     lidt(&idt_ptr);
-
 }
 

@@ -12,7 +12,11 @@ namespace phys
     constexpr unsigned long long k_MaxMemory = 1ULL << 32;
     // 1 bit per page
     constexpr std::size_t k_BitmapSize { k_MaxMemory / k_PageSize / 8};
-    constexpr uintptr_t k_KernelMemoryEnd = 0x00400000; // ~4 MB
+    constexpr uintptr_t k_KernelMemoryEnd = 0x00400000; // ~4 MiB
+
+    // aligned to 4 KB
+    constexpr uintptr_t k_FirstPageDirAddr { 0x00100000 };
+    constexpr uintptr_t k_FirstPageTableAddr { 0x00101000 };
 }
 
 void    init_bitmap();

@@ -13,7 +13,6 @@ GRUB_MKRESCUE := grub-mkrescue
 LIBSTDCXX_PATH := $(shell $(CXX) -print-file-name=libstdc++.a)
 LIBGCC_PATH := $(shell $(CXX) -print-file-name=libgcc.a)
 
-
 ASFLAGS :=
 								# -02 was acting up
 CXXFLAGS := -Iinclude -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
@@ -21,8 +20,8 @@ CXXFLAGS := -Iinclude -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
 LDFLAGS := -T $(SRC_DIR)/linker.ld -ffreestanding -O2 -nostdlib
 LIBS := $(LIBSTDCXX_PATH) $(LIBGCC_PATH)
 
-ASM_SRC := $(wildcard $(SRC_DIR)/*.asm)
-CPP_SRC := $(wildcard $(SRC_DIR)/*.cpp)
+ASM_SRC := $(shell find $(SRC_DIR) -name '*.asm')
+CPP_SRC := $(shell find $(SRC_DIR) -name '*.cpp')
 
 ASM_OBJS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/%.o, $(ASM_SRC))
 CPP_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CPP_SRC))
@@ -35,11 +34,11 @@ ISO := $(BUILD_DIR)/os.iso
 all: $(ISO)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.asm
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(KERNEL_BIN): $(ASM_OBJS) $(CPP_OBJS)
